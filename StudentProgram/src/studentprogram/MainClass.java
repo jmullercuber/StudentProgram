@@ -10,8 +10,11 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
  *
@@ -101,13 +104,22 @@ public class MainClass {
                 //call terminate
                 try {
                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                    out.println("DOWN");
+                    if (state == true) {
+                        out.println("DOWN");
+                    }
                 } catch (IOException ex) {
                 }
             }
         });
-        f.add(button);
-        f.setSize(400, 100);
+        button.setSize(400, 50);
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.add(button);
+        panel.add(new JLabel("CREATED BY SAM GOLDMAN"));
+        panel.add(new JLabel("TO LEARN MORE, VISIT:"));
+        panel.add(new JLabel("https://github.com/samg2014/StudentProgram.git"));
+        f.add(panel);
+        f.setSize(300, 115);
         f.setVisible(true);
     }
 }
