@@ -2,6 +2,8 @@ package studentprogram;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -25,7 +27,7 @@ public class MainClass {
     public static void main(String[] args) {
         state = false;
         try {
-            socket = new Socket("192.168.0.22", 42420);
+            socket = new Socket("192.168.0.22", 42421);
         } catch (UnknownHostException ex) {
             ex.printStackTrace();
         } catch (IOException ex) {
@@ -37,7 +39,7 @@ public class MainClass {
             out.println("USERNAME:" + System.getProperty("user.name"));
         } catch (IOException ex) {
         }
-        
+
         button = new JButton("Hand is DOWN");
         button.addActionListener(new ActionListener() {
             @Override
@@ -50,8 +52,7 @@ public class MainClass {
                         state = true;
                     } catch (Exception ex) {
                     }
-                }
-                else{
+                } else {
                     try {
                         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                         out.println("DOWN");
@@ -63,6 +64,17 @@ public class MainClass {
             }
         });
         JFrame f = new JFrame();
+        f.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                //call terminate
+                try {
+                    PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                    out.println("DOWN");
+                } catch (IOException ex) {
+                }
+            }
+        });
         f.add(button);
         f.setSize(400, 100);
         f.setVisible(true);
