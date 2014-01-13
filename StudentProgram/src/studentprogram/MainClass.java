@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -34,9 +36,13 @@ public class MainClass {
         try {
             socket = new Socket("192.168.0.22", 42421);
         } catch (UnknownHostException ex) {
-            ex.printStackTrace();
+            try {
+                socket = new Socket("DL3330-4G9MRT1", 42421);
+            } catch (UnknownHostException ex1) {
+            } catch (IOException ex1) {
+            }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            
         }
         PrintWriter out;
         try {
