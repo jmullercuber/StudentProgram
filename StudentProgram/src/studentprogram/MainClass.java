@@ -34,15 +34,9 @@ public class MainClass {
     public static void main(String[] args) {
         state = false;
         try {
-            socket = new Socket("192.168.0.22", 42421);
+            socket = new Socket("IST-RM101-TS", 42421); //IST-RM101-TS , 102.168.0.22
         } catch (UnknownHostException ex) {
-            try {
-                socket = new Socket("DL3330-4G9MRT1", 42421);
-            } catch (UnknownHostException ex1) {
-            } catch (IOException ex1) {
-            }
         } catch (IOException ex) {
-            
         }
         PrintWriter out;
         try {
