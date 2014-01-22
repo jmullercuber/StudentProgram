@@ -66,7 +66,7 @@ public class MainClass {
                                 try {
                                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                                     out.println("DOWN");
-                                    out.println("QUIT");
+                                    //out.println("QUIT");
                                     button.setText("Hand is DOWN");
                                     state = false;
                                 } catch (Exception ex) {
@@ -135,6 +135,10 @@ public class MainClass {
                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                     if (state == true) {
                         out.println("DOWN");
+                    }
+                    if (state2 == true)
+                    {
+                        out.println("QUIT");
                     }
                 } catch (IOException ex) {
                 }
