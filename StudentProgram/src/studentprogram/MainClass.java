@@ -28,6 +28,8 @@ public class MainClass {
     static Socket socket;
     static boolean state, state2;
 
+    //Testing out branch capability
+    
     /**
      * @param args the command line arguments
      */
