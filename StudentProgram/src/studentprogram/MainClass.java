@@ -24,17 +24,18 @@ import javax.swing.JPanel;
  */
 public class MainClass {
 
-    static JButton button;
+    static JButton button, button2;
     static Socket socket;
-    static boolean state;
+    static boolean state, state2;
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         state = false;
+        state2 = false;
         try {
-            socket = new Socket("IST-RM101-TS", 42421); //IST-RM101-TS , 102.168.0.22
+            socket = new Socket("127.0.0.1", 42421); //IST-RM101-TS , 102.168.0.22
         } catch (UnknownHostException ex) {
         } catch (IOException ex) {
         }
@@ -75,6 +76,7 @@ public class MainClass {
             }
         };
         button = new JButton("Hand is DOWN");
+        button2 = new JButton("No Current Grading Request");
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -92,6 +94,29 @@ public class MainClass {
                         out.println("DOWN");
                         button.setText("Hand is DOWN");
                         state = false;
+                    } catch (Exception ex) {
+                    }
+                }
+            }
+        });
+        
+        button2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (state2 == false) {
+                    try {
+                        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                        out.println("GRADEME");
+                        button2.setText("Grading Request Sent");
+                        state2 = true;
+                    } catch (Exception ex) {
+                    }
+                } else {
+                    try {
+                        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                        out.println("NOGRADE");
+                        button2.setText("No Current Grading Request");
+                        state2 = false;
                     } catch (Exception ex) {
                     }
                 }
@@ -115,11 +140,13 @@ public class MainClass {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.add(button);
+        panel.add(button2);
         panel.add(new JLabel("CREATED BY SAM GOLDMAN"));
         panel.add(new JLabel("TO LEARN MORE, VISIT:"));
         panel.add(new JLabel("https://github.com/samg2014/StudentProgram.git"));
+        panel.add(new JLabel("https://github.com/samg2014/TeacherProgram.git"));
         f.add(panel);
-        f.setSize(300, 115);
+        f.setSize(300, 170);
         f.setVisible(true);
     }
 }
