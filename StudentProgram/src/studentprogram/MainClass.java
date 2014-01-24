@@ -133,6 +133,8 @@ public class MainClass {
                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                     if (state == true) {
                         out.println("DOWN");
+                        out.println("NOGRADE");
+                        out.println("QUIT");
                     }
                 } catch (IOException ex) {
                 }
