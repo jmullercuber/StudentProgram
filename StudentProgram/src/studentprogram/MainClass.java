@@ -10,8 +10,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -148,7 +146,7 @@ public class MainClass {
         panel.add(new JLabel("CREATED BY SAM GOLDMAN"));
         panel.add(new JLabel("TO LEARN MORE, VISIT:"));
         panel.add(new JLabel("https://github.com/samg2014/StudentProgram.git"));
-        panel.add(new JLabel("https://github.com/samg2014/TeacherProgram.git"));
+        panel.add(new JLabel("https://github.com/samg2014/TeacherRMH.git"));
         f.add(panel);
         f.setSize(300, 170);
         f.setVisible(true);
