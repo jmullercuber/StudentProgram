@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.ImageIcon;
 
 /**
  *
@@ -174,8 +175,12 @@ public class MainClass {
             }
         });
         //Graphics stuff:
-        
+
         button.setSize(400, 50);
+        JLabel label = null;
+        ImageIcon i;
+        i = new ImageIcon(new MainClass().getClass().getResource("/image.jpg"));
+        label = new JLabel(i);
         //Initialize JPanel
         JPanel panel = new JPanel();
         //Things added top to bottom
@@ -184,16 +189,19 @@ public class MainClass {
         panel.add(button);
         //Add button2 to panel
         panel.add(button2);
+        panel.add(label);
         //Add labels
         panel.add(new JLabel("CREATED BY SAM GOLDMAN"));
         panel.add(new JLabel("TO LEARN MORE, VISIT:"));
         panel.add(new JLabel("https://github.com/samg2014/StudentProgram.git"));
         panel.add(new JLabel("https://github.com/samg2014/TeacherRMH.git"));
-        
+
         //Add panel to frame
         f.add(panel);
         //Set frame size
-        f.setSize(300, 170);
+        //300, 170
+        f.setSize(300, 350);
+        f.setResizable(false);
         //Show frame
         f.setVisible(true);
     }
