@@ -205,4 +205,13 @@ public class MainClass {
         //Show frame
         f.setVisible(true);
     }
+    
+    // a method that puts both of the hand states to false and changes the buttons.
+    public void putHandDown()
+    {
+        stateAssist = false;
+        stateGrade = false;
+        assistButton.setText("Hand is DOWN");
+        gradeButton.setText("No Current Grading Request");
+    }
 }
