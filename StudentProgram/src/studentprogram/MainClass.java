@@ -21,22 +21,22 @@ import javax.swing.ImageIcon;
  */
 public class MainClass {
 
-    //button: the button for the student to request help
-    //button2: the button for the student to request grading
-    static JButton button, button2;
+    //assistButton: the button for the student to request help
+    //gradeButton: the button for the student to request grading
+    static JButton assistButton, gradeButton;
     //socket: the network socket that the application uses to connect to the server
     static Socket socket;
-    //state: true = help request; false = no help request
-    //state2: true = grade request; false = no grade request
-    static boolean state, state2;
+    //stateAssist: true = help request; false = no help request
+    //stateGrade: true = grade request; false = no grade request
+    static boolean stateAssist, stateGrade;
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         //no requests on startup
-        state = false;
-        state2 = false;
+        stateAssist = false;
+        stateGrade = false;
         try {
             //attempt to connect to the server
             //server will be at 127.0.0.1 for testing or IST-RM101-TS for deployed version
@@ -86,12 +86,12 @@ public class MainClass {
 //        };
 
         //initialize button
-        button = new JButton("Hand is DOWN");
+        assistButton = new JButton("Hand is DOWN");
         //initialize button2
-        button2 = new JButton("No Current Grading Request");
+        gradeButton = new JButton("No Current Grading Request");
 
         //Add action for when button is pressed
-        button.addActionListener(new ActionListener() {
+        assistButton.addActionListener(new ActionListener() {
             @Override
             //When the button is pressed, do this
             public void actionPerformed(ActionEvent e) {
@@ -102,27 +102,27 @@ public class MainClass {
                     out = new PrintWriter(socket.getOutputStream(), true);
                 } catch (IOException ex) {
                 }
-                if (state == false) {
+                if (stateAssist == false) {
                     //If there is no help request:
                     //Send command to the server to put hand up
                     out.println("UP");
                     //Update the button
-                    button.setText("Hand is UP");
+                    assistButton.setText("Hand is UP");
                     //Update the variable
-                    state = true;
+                    stateAssist = true;
                 } else {
                     //If there is a help request:
                     //Send command to the server to put hand down
                     out.println("DOWN");
                     //Update the button
-                    button.setText("Hand is DOWN");
+                    assistButton.setText("Hand is DOWN");
                     //Update the variable
-                    state = false;
+                    stateAssist = false;
                 }
             }
         });
 
-        button2.addActionListener(new ActionListener() {
+        gradeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //Declare the PrintWriter
@@ -132,22 +132,22 @@ public class MainClass {
                     out = new PrintWriter(socket.getOutputStream(), true);
                 } catch (IOException ex) {
                 }
-                if (state2 == false) {
+                if (stateGrade == false) {
                     //If there is no grading request:
                     //Send the command to the server to place a grading request
                     out.println("GRADEME");
                     //Update the button
-                    button2.setText("Grading Request Sent");
+                    gradeButton.setText("Grading Request Sent");
                     //update the variable
-                    state2 = true;
+                    stateGrade = true;
                 } else {
                     //If there is a grading request:
                     //Send the command to the server to remove the grading request
                     out.println("NOGRADE");
                     //Update the button
-                    button2.setText("No Current Grading Request");
+                    gradeButton.setText("No Current Grading Request");
                     //update the variable
-                    state2 = false;
+                    stateGrade = false;
                 }
             }
         });
@@ -160,11 +160,11 @@ public class MainClass {
                 //call terminate
                 try {
                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                    if (state) {
+                    if (stateAssist) {
                         //If hand is up, put it down
                         out.println("DOWN");
                     }
-                    if (state2) {
+                    if (stateGrade) {
                         //If grading request is present, close it
                         out.println("NOGRADE");
                     }
@@ -176,7 +176,7 @@ public class MainClass {
         });
         //Graphics stuff:
 
-        button.setSize(400, 50);
+        assistButton.setSize(400, 50);
         JLabel label = null;
         ImageIcon i;
         i = new ImageIcon(new MainClass().getClass().getResource("/image.jpg"));
@@ -186,9 +186,9 @@ public class MainClass {
         //Things added top to bottom
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         //Add button to panel
-        panel.add(button);
+        panel.add(assistButton);
         //Add button2 to panel
-        panel.add(button2);
+        panel.add(gradeButton);
         panel.add(label);
         //Add labels
         panel.add(new JLabel("CREATED BY SAM GOLDMAN"));
