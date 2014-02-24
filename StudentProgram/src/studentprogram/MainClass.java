@@ -4,7 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -26,9 +28,14 @@ public class MainClass {
     static JButton assistButton, gradeButton;
     //socket: the network socket that the application uses to connect to the server
     static Socket socket;
+    
+    static BufferedReader input;
     //stateAssist: true = help request; false = no help request
     //stateGrade: true = grade request; false = no grade request
     static boolean stateAssist, stateGrade;
+            //server will be at 127.0.0.1 for testing or IST-RM101-TS for deployed version
+    static String teacherAddress = "127.0.0.1";
+    static boolean running;
 
     /**
      * @param args the command line arguments
@@ -37,10 +44,10 @@ public class MainClass {
         //no requests on startup
         stateAssist = false;
         stateGrade = false;
+        running = true;
         try {
             //attempt to connect to the server
-            //server will be at 127.0.0.1 for testing or IST-RM101-TS for deployed version
-            socket = new Socket("127.0.0.1", 42421);
+            socket = new Socket(teacherAddress, 42421);
         } catch (UnknownHostException ex) {
         } catch (IOException ex) {
         }
@@ -53,37 +60,32 @@ public class MainClass {
             out.println("USERNAME:" + System.getProperty("user.name"));
         } catch (IOException ex) {
         }
+        try {
+            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        } catch (IOException ex) {
+        }
 
-        //Thread to attempt to read input from the server, dormant for now
-//        Thread thread = new Thread() {
-//            @Override
-//            public void run() {
-//                BufferedReader input = null;
-//                try {
-//                    input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//                } catch (IOException ex) {
-//                }
-//                while (true) {
-//                    try {
-//                        String read = input.readLine();
-//                        if (read.equals("DOWN")) {
-//                            if (state == true) {
-//                                try {
-//                                    PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-//                                    out.println("DOWN");
-//                                    out.println("QUIT");
-//                                    button.setText("Hand is DOWN");
-//                                    state = false;
-//                                } catch (Exception ex) {
-//                                }
-//                            }
-//                        }
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        };
+        // Read input from the server
+        Thread thread = new Thread() {
+            public void run() {
+                while (running) {
+                    System.out.println(" Special thread is running ");
+                    String read = null;
+                    try {
+                        System.out.println(" Try creating input ");
+                        
+                        System.out.println(" Created input. Try reading input ");
+                        read = input.readLine();
+                        System.out.println(" Input is working ");
+                    } catch (IOException ex) {
+                    }
+                    if (read.equals("Teacher is putting your hand DOWN")) {
+                        putHandDown();
+                    }
+                }
+            }
+        };
+        thread.start();
 
         //initialize button
         assistButton = new JButton("Hand is DOWN");
@@ -92,7 +94,6 @@ public class MainClass {
 
         //Add action for when button is pressed
         assistButton.addActionListener(new ActionListener() {
-            @Override
             //When the button is pressed, do this
             public void actionPerformed(ActionEvent e) {
                 //Declare PrintWriter for this thread
@@ -102,7 +103,7 @@ public class MainClass {
                     out = new PrintWriter(socket.getOutputStream(), true);
                 } catch (IOException ex) {
                 }
-                if (stateAssist == false) {
+                if (stateAssist == false && stateGrade == false) {
                     //If there is no help request:
                     //Send command to the server to put hand up
                     out.println("UP");
@@ -132,7 +133,7 @@ public class MainClass {
                     out = new PrintWriter(socket.getOutputStream(), true);
                 } catch (IOException ex) {
                 }
-                if (stateGrade == false) {
+                if (stateAssist == false && stateGrade == false) {
                     //If there is no grading request:
                     //Send the command to the server to place a grading request
                     out.println("GRADEME");
@@ -170,6 +171,7 @@ public class MainClass {
                     }
                     //Tell the server to sever tie
                     out.println("QUIT");
+                    running = false;
                 } catch (IOException ex) {
                 }
             }
@@ -207,7 +209,7 @@ public class MainClass {
     }
     
     // a method that puts both of the hand states to false and changes the buttons.
-    public void putHandDown()
+    public static void putHandDown()
     {
         stateAssist = false;
         stateGrade = false;
