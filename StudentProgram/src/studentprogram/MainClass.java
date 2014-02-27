@@ -4,13 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.BindException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import javax.swing.BoxLayout;
@@ -21,9 +16,9 @@ import javax.swing.JPanel;
 import javax.swing.ImageIcon;
 
 /**
- *
- * @author Sam
- */
+*
+* @author Sam
+*/
 public class MainClass {
 
     //assistButton: the button for the student to request help
@@ -31,40 +26,21 @@ public class MainClass {
     static JButton assistButton, gradeButton;
     //socket: the network socket that the application uses to connect to the server
     static Socket socket;
-    static Socket listenToTeacherSocket;
-    static ServerSocket ss;
-    
-    static BufferedReader teacherInput;
     //stateAssist: true = help request; false = no help request
     //stateGrade: true = grade request; false = no grade request
     static boolean stateAssist, stateGrade;
-            //server will be at 127.0.0.1 for testing or IST-RM101-TS for deployed version
-    static String teacherAddress;
-    static String myAddress;
-    static boolean running;
 
     /**
-     * @param args the command line arguments
-     */
+* @param args the command line arguments
+*/
     public static void main(String[] args) {
         //no requests on startup
         stateAssist = false;
         stateGrade = false;
-        running = true;
-        teacherAddress = "127.0.0.1";
-        while (true) {
-            try {
-                System.out.println("Trying to get myAddress");
-                myAddress = InetAddress.getLocalHost().getHostAddress().toString();
-                System.out.println("Got myAddress:" + myAddress);
-                break;
-            }
-            catch (UnknownHostException e) {}
-        }
-    
         try {
             //attempt to connect to the server
-            socket = new Socket(teacherAddress, 42421);
+            //server will be at 127.0.0.1 for testing or IST-RM101-TS for deployed version
+            socket = new Socket("127.0.0.1", 42421);
         } catch (UnknownHostException ex) {
         } catch (IOException ex) {
         }
@@ -75,57 +51,9 @@ public class MainClass {
             out = new PrintWriter(socket.getOutputStream(), true);
             //Send the server your username, gotten by the computer
             out.println("USERNAME:" + System.getProperty("user.name"));
-            out.println("IPADDRESS:" + myAddress);
-        } catch (IOException ex) {}
-        
-        //Thread for operating the server
-        // and reading input from the server
-        Thread thread = new Thread() {
-            public void run() {
-                
-                //Try to initialize the server on port 42421
-                try {
-                    ss = new ServerSocket(42422);
-                } catch (BindException e) {
-                } catch (IOException e) {
-                }
-                //Accept connections forever, or until the application is closed
-                while (true) {
-                    listenToTeacherSocket = null;
-                    try {
-                        System.out.println("Waiting for teacher socket");
-                        System.out.println("Still waiting");
-                        //Accept an incoming connection and store it to socket
-                        listenToTeacherSocket = ss.accept();
-                        System.out.println("Got teacher socket");
-                        teacherInput = new BufferedReader(new InputStreamReader(listenToTeacherSocket.getInputStream()));
-                        System.out.println("Accepting teacher input");
-                        break;
-                    }
-                    catch (IOException ex) {}
-                    catch (NullPointerException e) {}
-                    System.out.println("Out of loop");
-                }
-                
-                while (running) {
-                    System.out.println(" Special thread is running ");
-                    String read = null;
-                    try {
-                        System.out.println(" Created input. Try reading input ");
-                        read = teacherInput.readLine();
-                        System.out.println(" Input is working ");
-                    } catch (IOException ex) {
-                    }
-                    System.out.println(read);
-                    if (read.equals("OWND")) {
-                        putHandDown();
-                    }
-                }
-            }
-        };
-        //Starts the thread
-        thread.start();
-        
+        } catch (IOException ex) {
+        }
+
         //initialize button
         assistButton = new JButton("Hand is DOWN");
         //initialize button2
@@ -133,6 +61,7 @@ public class MainClass {
 
         //Add action for when button is pressed
         assistButton.addActionListener(new ActionListener() {
+            @Override
             //When the button is pressed, do this
             public void actionPerformed(ActionEvent e) {
                 //Declare PrintWriter for this thread
@@ -142,7 +71,7 @@ public class MainClass {
                     out = new PrintWriter(socket.getOutputStream(), true);
                 } catch (IOException ex) {
                 }
-                if (stateAssist == false && stateGrade == false) {
+                if (stateAssist == false) {
                     //If there is no help request:
                     //Send command to the server to put hand up
                     out.println("UP");
@@ -150,7 +79,7 @@ public class MainClass {
                     assistButton.setText("Hand is UP");
                     //Update the variable
                     stateAssist = true;
-                } else if (stateAssist == true) {
+                } else {
                     //If there is a help request:
                     //Send command to the server to put hand down
                     out.println("DOWN");
@@ -172,7 +101,7 @@ public class MainClass {
                     out = new PrintWriter(socket.getOutputStream(), true);
                 } catch (IOException ex) {
                 }
-                if (stateAssist == false && stateGrade == false) {
+                if (stateGrade == false) {
                     //If there is no grading request:
                     //Send the command to the server to place a grading request
                     out.println("GRADEME");
@@ -180,7 +109,7 @@ public class MainClass {
                     gradeButton.setText("Grading Request Sent");
                     //update the variable
                     stateGrade = true;
-                } else if (stateGrade == true) {
+                } else {
                     //If there is a grading request:
                     //Send the command to the server to remove the grading request
                     out.println("NOGRADE");
@@ -210,7 +139,6 @@ public class MainClass {
                     }
                     //Tell the server to sever tie
                     out.println("QUIT");
-                    running = false;
                 } catch (IOException ex) {
                 }
             }
@@ -248,20 +176,11 @@ public class MainClass {
     }
     
     // a method that puts both of the hand states to false and changes the buttons.
-    public static void putHandDown()
+    public void putHandDown()
     {
-          if(assistButton.getText().equals("Hand is UP"))
-          {
-              assistButton.doClick();
-          }
-          if(gradeButton.getText().equals("Grading Request Sent"))
-          {
-              gradeButton.doClick();
-          }
-//        stateAssist = false;
-//        stateGrade = false;
-//        assistButton.setText("Hand is DOWN");
-//        gradeButton.setText("No Current Grading Request");
+        stateAssist = false;
+        stateGrade = false;
+        assistButton.setText("Hand is DOWN");
+        gradeButton.setText("No Current Grading Request");
     }
-    
 }
