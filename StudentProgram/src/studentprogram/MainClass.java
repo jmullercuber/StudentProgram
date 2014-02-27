@@ -43,7 +43,7 @@ public class MainClass {
         try {
             //attempt to connect to the server
             //server will be at 127.0.0.1 for testing or IST-RM101-TS for deployed version
-            socket = new Socket("127.0.0.1", 42421);
+            socket = new Socket("IST-RM101-TS", 42421);
         } catch (UnknownHostException ex) {
         } catch (IOException ex) {
         }
