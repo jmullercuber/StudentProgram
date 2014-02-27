@@ -29,6 +29,9 @@ public class MainClass {
     //stateAssist: true = help request; false = no help request
     //stateGrade: true = grade request; false = no grade request
     static boolean stateAssist, stateGrade;
+    static JLabel label;
+    static ImageIcon downImage;
+    static ImageIcon upImage;
 
     /**
 * @param args the command line arguments
@@ -71,7 +74,7 @@ public class MainClass {
                     out = new PrintWriter(socket.getOutputStream(), true);
                 } catch (IOException ex) {
                 }
-                if (stateAssist == false) {
+                if (stateAssist == false && stateGrade == false) {
                     //If there is no help request:
                     //Send command to the server to put hand up
                     out.println("UP");
@@ -79,7 +82,8 @@ public class MainClass {
                     assistButton.setText("Hand is UP");
                     //Update the variable
                     stateAssist = true;
-                } else {
+                    label.setIcon(upImage);
+                } else if (stateAssist) {
                     //If there is a help request:
                     //Send command to the server to put hand down
                     out.println("DOWN");
@@ -87,6 +91,7 @@ public class MainClass {
                     assistButton.setText("Hand is DOWN");
                     //Update the variable
                     stateAssist = false;
+                    label.setIcon(downImage);
                 }
             }
         });
@@ -101,7 +106,7 @@ public class MainClass {
                     out = new PrintWriter(socket.getOutputStream(), true);
                 } catch (IOException ex) {
                 }
-                if (stateGrade == false) {
+                if (stateAssist == false && stateGrade == false) {
                     //If there is no grading request:
                     //Send the command to the server to place a grading request
                     out.println("GRADEME");
@@ -109,7 +114,8 @@ public class MainClass {
                     gradeButton.setText("Grading Request Sent");
                     //update the variable
                     stateGrade = true;
-                } else {
+                    label.setIcon(upImage);
+                } else if (stateGrade) {
                     //If there is a grading request:
                     //Send the command to the server to remove the grading request
                     out.println("NOGRADE");
@@ -117,6 +123,7 @@ public class MainClass {
                     gradeButton.setText("No Current Grading Request");
                     //update the variable
                     stateGrade = false;
+                    label.setIcon(downImage);
                 }
             }
         });
@@ -146,10 +153,10 @@ public class MainClass {
         //Graphics stuff:
 
         assistButton.setSize(400, 50);
-        JLabel label = null;
-        ImageIcon i;
-        i = new ImageIcon(new MainClass().getClass().getResource("/image.jpg"));
-        label = new JLabel(i);
+        downImage = new ImageIcon(new MainClass().getClass().getResource("/downImage.jpg"));
+        upImage = new ImageIcon(new MainClass().getClass().getResource("/upImage.jpg"));
+        label = new JLabel();
+        label.setIcon(downImage);
         //Initialize JPanel
         JPanel panel = new JPanel();
         //Things added top to bottom
