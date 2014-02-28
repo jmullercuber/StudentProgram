@@ -14,7 +14,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.ImageIcon;
-
 /**
  *
  * @author Sam
@@ -40,7 +39,7 @@ public class MainClass {
         try {
             //attempt to connect to the server
             //server will be at 127.0.0.1 for testing or IST-RM101-TS for deployed version
-            socket = new Socket("127.0.0.1", 42421);
+            socket = new Socket("IST-PBC024", 42421);
         } catch (UnknownHostException ex) {
         } catch (IOException ex) {
         }
@@ -189,7 +188,7 @@ public class MainClass {
         panel.add(button);
         //Add button2 to panel
         panel.add(button2);
-        panel.add(label);
+        //panel.add(label);
         //Add labels
         panel.add(new JLabel("CREATED BY SAM GOLDMAN"));
         panel.add(new JLabel("TO LEARN MORE, VISIT:"));
@@ -200,7 +199,7 @@ public class MainClass {
         f.add(panel);
         //Set frame size
         //300, 170
-        f.setSize(300, 350);
+        f.setSize(300, 170);
         f.setResizable(false);
         //Show frame
         f.setVisible(true);
