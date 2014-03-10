@@ -4,20 +4,25 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.ImageIcon;
+
 /**
-*
-* @author Sam
-*/
+ *
+ * @author Sam
+ */
 public class MainClass {
 
     //assistButton: the button for the student to request help
@@ -31,10 +36,11 @@ public class MainClass {
     static JLabel label;
     static ImageIcon downImage;
     static ImageIcon upImage;
+    static BufferedReader in;
 
     /**
-* @param args the command line arguments
-*/
+     * @param args the command line arguments
+     */
     public static void main(String[] args) {
         //no requests on startup
         stateAssist = false;
@@ -42,9 +48,14 @@ public class MainClass {
         try {
             //attempt to connect to the server
             //server will be at 127.0.0.1 for testing or IST-RM101-TS for deployed version
-            socket = new Socket("IST-PBC024", 42421);
+            socket = new Socket("127.0.0.1", 42421);
         } catch (UnknownHostException ex) {
         } catch (IOException ex) {
+        }
+        try {
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
         //Declare the PrintWriter for sending commands to the server
         PrintWriter out;
@@ -73,7 +84,7 @@ public class MainClass {
                     out = new PrintWriter(socket.getOutputStream(), true);
                 } catch (IOException ex) {
                 }
-                if (stateAssist == false && stateGrade == false) {
+                if (stateAssist == false) {
                     //If there is no help request:
                     //Send command to the server to put hand up
                     out.println("UP");
@@ -82,7 +93,7 @@ public class MainClass {
                     //Update the variable
                     stateAssist = true;
                     label.setIcon(upImage);
-                } else if (stateAssist) {
+                } else {
                     //If there is a help request:
                     //Send command to the server to put hand down
                     out.println("DOWN");
@@ -105,7 +116,7 @@ public class MainClass {
                     out = new PrintWriter(socket.getOutputStream(), true);
                 } catch (IOException ex) {
                 }
-                if (stateAssist == false && stateGrade == false) {
+                if (stateGrade == false) {
                     //If there is no grading request:
                     //Send the command to the server to place a grading request
                     out.println("GRADEME");
@@ -114,7 +125,7 @@ public class MainClass {
                     //update the variable
                     stateGrade = true;
                     label.setIcon(upImage);
-                } else if (stateGrade) {
+                } else {
                     //If there is a grading request:
                     //Send the command to the server to remove the grading request
                     out.println("NOGRADE");
@@ -147,8 +158,36 @@ public class MainClass {
                     out.println("QUIT");
                 } catch (IOException ex) {
                 }
+                System.exit(1);
             }
         });
+
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                while(true)
+                {
+                    String read = null;
+                    try {
+                        read = in.readLine();
+                    } catch (IOException ex) {
+                    }
+                    if(read != null)
+                    {
+                        if(read.equals("ASSISTDOWN"))
+                        {
+                            assistButton.doClick();
+                        }
+                        if(read.equals("GRADEDOWN"))
+                        {
+                            gradeButton.doClick();
+                        }
+                    }
+                    System.out.println(read);
+                }
+            }
+        };
+        thread.start();
         //Graphics stuff:
 
         assistButton.setSize(400, 50);
@@ -180,13 +219,11 @@ public class MainClass {
         //Show frame
         f.setVisible(true);
     }
-    
-    // a method that puts both of the hand states to false and changes the buttons.
-    public void putHandDown()
-    {
-        stateAssist = false;
-        stateGrade = false;
-        assistButton.setText("Hand is DOWN");
-        gradeButton.setText("No Current Grading Request");
-    }
+//    // a method that puts both of the hand states to false and changes the buttons.
+//    public void putHandDown() {
+//        stateAssist = false;
+//        stateGrade = false;
+//        assistButton.setText("Hand is DOWN");
+//        gradeButton.setText("No Current Grading Request");
+//    }
 }
