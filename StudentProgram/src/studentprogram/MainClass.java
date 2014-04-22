@@ -4,7 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -26,12 +28,14 @@ public class MainClass {
     static JButton assistButton, gradeButton;
     //socket: the network socket that the application uses to connect to the server
     static Socket socket;
+    
+    static BufferedReader input;
     //stateAssist: true = help request; false = no help request
     //stateGrade: true = grade request; false = no grade request
     static boolean stateAssist, stateGrade;
-    static JLabel label;
-    static ImageIcon downImage;
-    static ImageIcon upImage;
+            //server will be at 127.0.0.1 for testing or IST-RM101-TS for deployed version
+    static String teacherAddress = "127.0.0.1";
+    static boolean running;
 
     /**
 * @param args the command line arguments
@@ -40,10 +44,10 @@ public class MainClass {
         //no requests on startup
         stateAssist = false;
         stateGrade = false;
+        running = true;
         try {
             //attempt to connect to the server
-            //server will be at 127.0.0.1 for testing or IST-RM101-TS for deployed version
-            socket = new Socket("IST-RM101-TS", 42421);
+            socket = new Socket(teacherAddress, 42421);
         } catch (UnknownHostException ex) {
         } catch (IOException ex) {
         }
@@ -56,6 +60,32 @@ public class MainClass {
             out.println("USERNAME:" + System.getProperty("user.name"));
         } catch (IOException ex) {
         }
+        try {
+            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        } catch (IOException ex) {
+        }
+
+        // Read input from the server
+        Thread thread = new Thread() {
+            public void run() {
+                while (running) {
+                    System.out.println(" Special thread is running ");
+                    String read = null;
+                    try {
+                        System.out.println(" Try creating input ");
+                        
+                        System.out.println(" Created input. Try reading input ");
+                        read = input.readLine();
+                        System.out.println(" Input is working ");
+                    } catch (IOException ex) {
+                    }
+                    if (read.equals("Teacher is putting your hand DOWN")) {
+                        putHandDown();
+                    }
+                }
+            }
+        };
+        thread.start();
 
         //initialize button
         assistButton = new JButton("Hand is DOWN");
@@ -64,7 +94,6 @@ public class MainClass {
 
         //Add action for when button is pressed
         assistButton.addActionListener(new ActionListener() {
-            @Override
             //When the button is pressed, do this
             public void actionPerformed(ActionEvent e) {
                 //Declare PrintWriter for this thread
@@ -82,8 +111,7 @@ public class MainClass {
                     assistButton.setText("Hand is UP");
                     //Update the variable
                     stateAssist = true;
-                    label.setIcon(upImage);
-                } else if (stateAssist) {
+                } else {
                     //If there is a help request:
                     //Send command to the server to put hand down
                     out.println("DOWN");
@@ -91,7 +119,6 @@ public class MainClass {
                     assistButton.setText("Hand is DOWN");
                     //Update the variable
                     stateAssist = false;
-                    label.setIcon(downImage);
                 }
             }
         });
@@ -114,8 +141,7 @@ public class MainClass {
                     gradeButton.setText("Grading Request Sent");
                     //update the variable
                     stateGrade = true;
-                    label.setIcon(upImage);
-                } else if (stateGrade) {
+                } else {
                     //If there is a grading request:
                     //Send the command to the server to remove the grading request
                     out.println("NOGRADE");
@@ -123,7 +149,6 @@ public class MainClass {
                     gradeButton.setText("No Current Grading Request");
                     //update the variable
                     stateGrade = false;
-                    label.setIcon(downImage);
                 }
             }
         });
@@ -146,6 +171,7 @@ public class MainClass {
                     }
                     //Tell the server to sever tie
                     out.println("QUIT");
+                    running = false;
                 } catch (IOException ex) {
                 }
             }
@@ -153,10 +179,10 @@ public class MainClass {
         //Graphics stuff:
 
         assistButton.setSize(400, 50);
-        downImage = new ImageIcon(new MainClass().getClass().getResource("/downImage.jpg"));
-        upImage = new ImageIcon(new MainClass().getClass().getResource("/upImage.jpg"));
-        label = new JLabel();
-        label.setIcon(downImage);
+        JLabel label = null;
+        ImageIcon i;
+        i = new ImageIcon(new MainClass().getClass().getResource("/image.jpg"));
+        label = new JLabel(i);
         //Initialize JPanel
         JPanel panel = new JPanel();
         //Things added top to bottom
@@ -183,7 +209,7 @@ public class MainClass {
     }
     
     // a method that puts both of the hand states to false and changes the buttons.
-    public void putHandDown()
+    public static void putHandDown()
     {
         stateAssist = false;
         stateGrade = false;
