@@ -33,6 +33,9 @@ public class MainClass {
     //stateAssist: true = help request; false = no help request
     //stateGrade: true = grade request; false = no grade request
     static boolean stateAssist, stateGrade;
+	static JLabel label;
+    static ImageIcon downImage;
+    static ImageIcon upImage;
             //server will be at 127.0.0.1 for testing or IST-RM101-TS for deployed version
     static String teacherAddress = "127.0.0.1";
     static boolean running;
@@ -179,10 +182,10 @@ public class MainClass {
         //Graphics stuff:
 
         assistButton.setSize(400, 50);
-        JLabel label = null;
-        ImageIcon i;
-        i = new ImageIcon(new MainClass().getClass().getResource("/image.jpg"));
-        label = new JLabel(i);
+        downImage = new ImageIcon(new MainClass().getClass().getResource("/downImage.jpg"));
+        upImage = new ImageIcon(new MainClass().getClass().getResource("/upImage.jpg"));
+        label = new JLabel();
+        label.setIcon(downImage);
         //Initialize JPanel
         JPanel panel = new JPanel();
         //Things added top to bottom
