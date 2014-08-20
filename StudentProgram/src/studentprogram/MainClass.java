@@ -47,8 +47,8 @@ public class MainClass {
         stateGrade = false;
         try {
             //attempt to connect to the server
-            //server will be at 127.0.0.1 for testing or IST-RM101-TS for deployed version
-            socket = new Socket("127.0.0.1", 42421);
+            //server will be at 127.0.0.1 for testing or IST-RM101-TS for deployed version OHS-GVT8540-15
+            socket = new Socket("IST-RM101-TS", 42421);
         } catch (UnknownHostException ex) {
         } catch (IOException ex) {
         }
@@ -191,8 +191,8 @@ public class MainClass {
         //Graphics stuff:
 
         assistButton.setSize(400, 50);
-        downImage = new ImageIcon(new MainClass().getClass().getResource("/downImage.jpg"));
-        upImage = new ImageIcon(new MainClass().getClass().getResource("/upImage.jpg"));
+        downImage = new ImageIcon(new MainClass().getClass().getResource("/pi.jpg"));
+        upImage = new ImageIcon(new MainClass().getClass().getResource("/pi.jpg"));
         label = new JLabel();
         label.setIcon(downImage);
         //Initialize JPanel
@@ -214,7 +214,7 @@ public class MainClass {
         f.add(panel);
         //Set frame size
         //300, 170
-        f.setSize(300, 170);
+        f.setSize(300, 400);
         f.setResizable(false);
         //Show frame
         f.setVisible(true);
