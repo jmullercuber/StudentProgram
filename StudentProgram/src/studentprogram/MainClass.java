@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
@@ -43,6 +44,11 @@ public class MainClass {
      */
     public static void main(String[] args) {
         //no requests on startup
+        try {
+            ServerSocket serverSocket = new ServerSocket(42423);
+        } catch (IOException e) {
+            return;
+        }
         stateAssist = false;
         stateGrade = false;
         try {
@@ -165,21 +171,17 @@ public class MainClass {
         Thread thread = new Thread() {
             @Override
             public void run() {
-                while(true)
-                {
+                while (true) {
                     String read = null;
                     try {
                         read = in.readLine();
                     } catch (IOException ex) {
                     }
-                    if(read != null)
-                    {
-                        if(read.equals("ASSISTDOWN"))
-                        {
+                    if (read != null) {
+                        if (read.equals("ASSISTDOWN")) {
                             assistButton.doClick();
                         }
-                        if(read.equals("GRADEDOWN"))
-                        {
+                        if (read.equals("GRADEDOWN")) {
                             gradeButton.doClick();
                         }
                     }
